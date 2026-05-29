@@ -8,7 +8,7 @@ plain='\033[0m'
 cur_dir=$(pwd)
 
 # 检查是否为root用户
-[[ $EUID -ne 0 ]] &amp;&amp; echo -e "${red}致命错误：${plain}请使用root权限运行此脚本\n " &amp;&amp; exit 1
+[[ $EUID -ne 0 ]] && echo -e "${red}致命错误：${plain}请使用root权限运行此脚本\n " && exit 1
 
 # 检查操作系统并设置发行版变量
 if [[ -f /etc/os-release ]]; then
@@ -18,7 +18,7 @@ elif [[ -f /usr/lib/os-release ]]; then
     source /usr/lib/os-release
     release=$ID
 else
-    echo "检查系统操作系统失败，请联系作者！" &gt;&amp;2
+    echo "检查系统操作系统失败，请联系作者！" >&2
     exit 1
 fi
 echo "操作系统发行版：$release"
@@ -27,7 +27,7 @@ arch3xui() {
     case "$(uname -m)" in
     x86_64 | x64 | amd64) echo 'amd64' ;;
     armv8 | arm64 | aarch64) echo 'arm64' ;;
-    *) echo -e "${green}不支持的CPU架构！${plain}" &amp;&amp; rm -f install.sh &amp;&amp; exit 1 ;;
+    *) echo -e "${green}不支持的CPU架构！${plain}" && rm -f install.sh && exit 1 ;;
     esac
 }
 echo "架构：$(arch3xui)"
@@ -37,27 +37,27 @@ os_version=$(grep -i version_id /etc/os-release | cut -d \" -f2 | cut -d . -f1)
 
 if [[ "${release}" == "centos" ]]; then
     if [[ ${os_version} -lt 8 ]]; then
-        echo -e "${red} 请使用CentOS 8或更高版本 ${plain}\n" &amp;&amp; exit 1
+        echo -e "${red} 请使用CentOS 8或更高版本 ${plain}\n" && exit 1
     fi
 elif [[ "${release}" == "ubuntu" ]]; then
     if [[ ${os_version} -lt 20 ]]; then
-        echo -e "${red}请使用Ubuntu 20或更高版本！${plain}" &amp;&amp; exit 1
+        echo -e "${red}请使用Ubuntu 20或更高版本！${plain}" && exit 1
     fi
 
 elif [[ "${release}" == "fedora" ]]; then
     if [[ ${os_version} -lt 36 ]]; then
-        echo -e "${red}请使用Fedora 36或更高版本！${plain}" &amp;&amp; exit 1
+        echo -e "${red}请使用Fedora 36或更高版本！${plain}" && exit 1
     fi
 
 elif [[ "${release}" == "debian" ]]; then
     if [[ ${os_version} -lt 10 ]]; then
-        echo -e "${red} 请使用Debian 10或更高版本 ${plain}\n" &amp;&amp; exit 1
+        echo -e "${red} 请使用Debian 10或更高版本 ${plain}\n" && exit 1
     fi
 elif [[ "${release}" == "arch" ]]; then
     echo "操作系统为ArchLinux"
 
 else
-    echo -e "${red}检查操作系统版本失败，请联系作者！${plain}" &amp;&amp; exit 1
+    echo -e "${red}检查操作系统版本失败，请联系作者！${plain}" && exit 1
 fi
 
 install_base() {
@@ -73,7 +73,6 @@ install_base() {
             ;;
     esac
 }
-
 
 # 安装完成后配置面板（出于安全考虑）
 config_after_install() {
@@ -154,12 +153,6 @@ install_x-ui() {
     chmod +x /usr/local/x-ui/x-ui.sh
     chmod +x /usr/bin/x-ui
     config_after_install
-    #echo -e "如果是全新安装，默认Web端口为${green}2053${plain}，默认用户名和密码为${green}admin${plain}"
-    #echo -e "请确保此端口没有被其他程序占用，${yellow}并确保端口2053已放行${plain}"
-    #    echo -e "如果您想将2053修改为其他端口并输入x-ui命令进行修改，还必须确保您修改的端口也已放行"
-    #echo -e ""
-    #echo -e "如果是升级面板，请使用之前的方式访问面板"
-    #echo -e ""
     systemctl daemon-reload
     systemctl enable x-ui
     systemctl start x-ui
@@ -185,4 +178,3 @@ install_x-ui() {
 echo -e "${green}正在运行...${plain}"
 install_base
 install_x-ui $1
-
