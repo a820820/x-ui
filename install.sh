@@ -90,31 +90,31 @@ fi
 fi
 fi
 fi
-packages=("curl" "openssl" "焦油" "expect" "xxd" "python3" "wget" "git")
-inspackages=("curl" "openssl" "焦油" "expect" "xxd" "python3" "wget" "git")
-为 i 在 "${!packages[@]}"; do
+packages=("curl" "openssl" "tar" "expect" "xxd" "python3" "wget" "git")
+inspackages=("curl" "openssl" "tar" "expect" "xxd" "python3" "wget" "git")
+for i in "${!packages[@]}"; do
 package="${packages[$i]}"
 inspackage="${inspackages[$i]}"
-如果 ! 命令 -v "$package" &> /dev/null; then
-如果 [ -x "$(命令 -v apt-get)" ]; then
+if ! command -v "$package" &> /dev/null; then
+if [ -x "$(command -v apt-get)" ]; then
 apt-get install -y "$inspackage"
-elif [ -x "$(命令 -v yum)" ]; then
+elif [ -x "$(command -v yum)" ]; then
 yum install -y "$inspackage"
-elif [ -x "$(命令 -v dnf)" ]; then
+elif [ -x "$(command -v dnf)" ]; then
 dnf install -y "$inspackage"
 fi
 fi
-完成
+done
 fi
 touch xuiyg_update
 fi
-如果 [[ $vi = openvz ]]; then
+if [[ $vi = openvz ]]; then
 TUN=$(cat /dev/net/tun 2>&1)
-如果 [[ ! $TUN =~ 'in bad state' ]] && [[ ! $TUN =~ '处于错误状态' ]] && [[ ! $TUN =~ 'Die Dateizugriffsnummer ist 在 schlechter Verfassung' ]]; then 
-红 "检测到未开启TUN，现尝试添加TUN支持" && sleep 4
+if [[ ! $TUN =~ 'in bad state' ]] && [[ ! $TUN =~ '处于错误状态' ]] && [[ ! $TUN =~ 'Die Dateizugriffsnummer ist in schlechter Verfassung' ]]; then 
+red "检测到未开启TUN，现尝试添加TUN支持" && sleep 4
 cd /dev && mkdir net && mknod net/tun c 10 200 && chmod 0666 net/tun
 TUN=$(cat /dev/net/tun 2>&1)
-如果 [[ ! $TUN =~ 'in bad state' ]] && [[ ! $TUN =~ '处于错误状态' ]] && [[ ! $TUN =~ 'Die Dateizugriffsnummer ist 在 schlechter Verfassung' ]]; then 
+if [[ ! $TUN =~ 'in bad state' ]] && [[ ! $TUN =~ '处于错误状态' ]] && [[ ! $TUN =~ 'Die Dateizugriffsnummer ist in schlechter Verfassung' ]]; then 
 green "添加TUN支持失败，建议与VPS厂商沟通或后台设置开启" && exit
 else
 echo '#!/bin/bash' > /root/tun.sh && echo 'cd /dev && mkdir net && mknod net/tun c 10 200 && chmod 0666 net/tun' >> /root/tun.sh && chmod +x /root/tun.sh
@@ -135,15 +135,15 @@ v4dq=$(curl -s4m5 -k https://myip.ipip.net | awk -F'来自于：' '{print $2}' 2
 v6dq=$(curl -s6m5 -k https://ip.fm | sed -n 's/.*Location: //p' 2>/dev/null)
 }
 warpcheck(){
-wgcfv6=$(curl -s6m5 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp |切口 -d= -f2)
-wgcfv4=$(curl -s4m5 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp |切口 -d= -f2)
+wgcfv6=$(curl -s6m5 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
+wgcfv4=$(curl -s4m5 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
 }
 v6(){
 warpcheck
-如果 [[ ! $wgcfv4 =~ 在|plus && ! $wgcfv6 =~ 在|plus ]]; then
+if [[ ! $wgcfv4 =~ on|plus && ! $wgcfv6 =~ on|plus ]]; then
 v4=$(curl -s4m5 icanhazip.com -k)
-如果 [ -z $v4 ]; then
-黄 "检测到 纯IPV6 VPS，添加nat64"
+if [ -z $v4 ]; then
+yellow "检测到 纯IPV6 VPS，添加nat64"
 echo -e "nameserver 2a00:1098:2b::1\nnameserver 2a00:1098:2c::1" > /etc/resolv.conf
 fi
 fi
@@ -151,49 +151,49 @@ fi
 serinstall(){
 green "下载并安装x-ui相关组件……"
 cd /usr/local/
-#curl -L -o /usr/local/x-ui-linux-${cpu}.焦油.gz --insecure https://gitlab.com/rwkgyg/x-ui-yg/raw/main/x-ui-linux-${cpu}.焦油.gz
-curl -L -o /usr/local/x-ui-linux-${cpu}.焦油.gz -# --retry 2 --insecure https://github.com/yonggekkk/x-ui-yg/releases/下载/xui_yg/x-ui-linux-${cpu}.焦油.gz
-焦油 zxvf x-ui-linux-${cpu}.焦油.gz > /dev/null 2>&1
-rm x-ui-linux-${cpu}.焦油.gz -f
+#curl -L -o /usr/local/x-ui-linux-${cpu}.tar.gz --insecure https://gitlab.com/rwkgyg/x-ui-yg/raw/main/x-ui-linux-${cpu}.tar.gz
+curl -L -o /usr/local/x-ui-linux-${cpu}.tar.gz -# --retry 2 --insecure https://github.com/yonggekkk/x-ui-yg/releases/download/xui_yg/x-ui-linux-${cpu}.tar.gz
+tar zxvf x-ui-linux-${cpu}.tar.gz > /dev/null 2>&1
+rm x-ui-linux-${cpu}.tar.gz -f
 cd x-ui
 chmod +x x-ui bin/xray-linux-${cpu}
 cp -f x-ui.service /etc/systemd/system/ >/dev/null 2>&1
-systemctl 恶魔-reload >/dev/null 2>&1
-systemctl 启用 x-ui >/dev/null 2>&1
-systemctl 开始 x-ui >/dev/null 2>&1
+systemctl daemon-reload >/dev/null 2>&1
+systemctl enable x-ui >/dev/null 2>&1
+systemctl start x-ui >/dev/null 2>&1
 cd
 rm /usr/bin/x-ui -f
 #curl -L -o /usr/bin/x-ui --insecure https://gitlab.com/rwkgyg/x-ui-yg/raw/main/1install.sh >/dev/null 2>&1
 curl -L -o /usr/bin/x-ui -# --retry 2 --insecure https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh
 chmod +x /usr/bin/x-ui
-如果 [[ x"${释放}" == x"alpine" ]]; then
+if [[ x"${release}" == x"alpine" ]]; then
 echo '#!/sbin/openrc-run
-名称="x-ui"
-命令="/usr/local/x-ui/x-ui"
-directory="/usr/local/${名称}"
-pidfile="/var/run/${名称}.pid"
-command_background="是"
+name="x-ui"
+command="/usr/local/x-ui/x-ui"
+directory="/usr/local/${name}"
+pidfile="/var/run/${name}.pid"
+command_background="yes"
 depend() {
 need networking 
 }' > /etc/init.d/x-ui
 chmod +x /etc/init.d/x-ui
-rc-update 添加 x-ui 默认
-rc-service x-ui 开始
+rc-update add x-ui default
+rc-service x-ui start
 fi
-如果 [[ -f /usr/bin/x-ui && -f /usr/local/x-ui/bin/xray-linux-${cpu} ]]; then
+if [[ -f /usr/bin/x-ui && -f /usr/local/x-ui/bin/xray-linux-${cpu} ]]; then
 green "下载成功"
 else
-红 "下载失败，请检测VPS网络是否正常，脚本退出"
-如果 [[ x"${释放}" == x"alpine" ]]; then
+red "下载失败，请检测VPS网络是否正常，脚本退出"
+if [[ x"${release}" == x"alpine" ]]; then
 rc-service x-ui stop
-rc-update del x-ui 默认
+rc-update del x-ui default
 rm /etc/init.d/x-ui -f
 else
 systemctl stop x-ui
-systemctl 禁用 x-ui
+systemctl disable x-ui
 rm /etc/systemd/system/x-ui.service -f
-systemctl 恶魔-reload
-systemctl 重置-failed
+systemctl daemon-reload
+systemctl reset-failed
 fi
 rm /usr/bin/x-ui -f
 rm /etc/x-ui-yg/ -rf
@@ -205,31 +205,31 @@ fi
 userinstall(){
 readp "设置 x-ui 登录用户名（回车跳过为随机6位字符）：" username
 sleep 1
-如果 [[ -z ${username} ]]; then
-username=`date +%s%N |md5sum |切口 -c 1-6`
+if [[ -z ${username} ]]; then
+username=`date +%s%N |md5sum | cut -c 1-6`
 fi
-当 true; do
-如果 [[ ${username} == *admin* ]]; then
-红 "不支持包含有 admin 字样的用户名，请重新设置" && readp "设置 x-ui 登录用户名（回车跳过为随机6位字符）：" username
+while true; do
+if [[ ${username} == *admin* ]]; then
+red "不支持包含有 admin 字样的用户名，请重新设置" && readp "设置 x-ui 登录用户名（回车跳过为随机6位字符）：" username
 else
 break
 fi
-完成
+done
 sleep 1
 green "x-ui登录用户名：${username}"
 echo
 readp "设置 x-ui 登录密码（回车跳过为随机6位字符）：" password
 sleep 1
-如果 [[ -z ${password} ]]; then
-password=`date +%s%N |md5sum |切口 -c 1-6`
+if [[ -z ${password} ]]; then
+password=`date +%s%N |md5sum | cut -c 1-6`
 fi
-当 true; do
-如果 [[ ${password} == *admin* ]]; then
-红 "不支持包含有 admin 字样的密码，请重新设置" && readp "设置 x-ui 登录密码（回车跳过为随机6位字符）：" password
+while true; do
+if [[ ${password} == *admin* ]]; then
+red "不支持包含有 admin 字样的密码，请重新设置" && readp "设置 x-ui 登录密码（回车跳过为随机6位字符）：" password
 else
 break
 fi
-完成
+done
 sleep 1
 green "x-ui登录密码：${password}"
 /usr/local/x-ui/x-ui setting -username ${username} -password ${password} >/dev/null 2>&1
@@ -238,17 +238,17 @@ portinstall(){
 echo
 readp "设置 x-ui 登录端口[1-65535]（回车跳过为10000-65535之间的随机端口）：" port
 sleep 1
-如果 [[ -z $port ]]; then
+if [[ -z $port ]]; then
 port=$(shuf -i 10000-65535 -n 1)
 until [[ -z $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]] && [[ -z $(ss -tunlp | grep -w tcp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]] 
 do
-[[ -n $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") || -n $(ss -tunlp | grep -w tcp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]] && 黄 "\n端口被占用，请重新输入端口" && readp "自定义端口:" port
-完成
+[[ -n $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") || -n $(ss -tunlp | grep -w tcp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]] && yellow "\n端口被占用，请重新输入端口" && readp "自定义端口:" port
+done
 else
 until [[ -z $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]] && [[ -z $(ss -tunlp | grep -w tcp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]]
 do
-[[ -n $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") || -n $(ss -tunlp | grep -w tcp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]] && 黄 "\n端口被占用，请重新输入端口" && readp "自定义端口:" port
-完成
+[[ -n $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") || -n $(ss -tunlp | grep -w tcp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]] && yellow "\n端口被占用，请重新输入端口" && readp "自定义端口:" port
+done
 fi
 sleep 1
 /usr/local/x-ui/x-ui setting -port $port >/dev/null 2>&1
@@ -256,7 +256,7 @@ green "x-ui登录端口：${port}"
 }
 pathinstall(){
 echo
-readp "设置 x-ui 登录根路径（回车跳过为随机3位字符）：" 路径
+readp "设置 x-ui 登录根路径（回车跳过为随机3位字符）：" path
 sleep 1
 if [[ -z $path ]]; then
 path=`date +%s%N |md5sum | cut -c 1-3`
@@ -426,35 +426,35 @@ get_char(){
 SAVEDSTTY=`stty -g`
 stty -echo
 stty cbreak
-dd 如果=/dev/tty bs=1 数量=1 2> /dev/null
+dd if=/dev/tty bs=1 count=1 2> /dev/null
 stty -raw
 stty echo
 stty $SAVEDSTTY
 }
-返回(){
-白 "------------------------------------------------------------------------------------"
-白 " 回x-ui主菜单，请按任意键"
-白 " 退出脚本，请按Ctrl+C"
+back(){
+white "------------------------------------------------------------------------------------"
+white " 回x-ui主菜单，请按任意键"
+white " 退出脚本，请按Ctrl+C"
 get_char && show_menu
 }
 acme() {
 #bash <(curl -Ls https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh)
 bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/acme-yg/main/acme.sh)
-返回
+back
 }
 bbr() {
 bash <(curl -Ls https://raw.githubusercontent.com/teddysun/across/master/bbr.sh)
-返回
+back
 }
 cfwarp() {
 #bash <(curl -Ls https://gitlab.com/rwkgyg/CFwarp/raw/main/CFwarp.sh)
 bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/warp-yg/main/CFwarp.sh)
-返回
+back
 }
 xuirestop(){
 echo
 readp "1. 停止 x-ui \n2. 重启 x-ui \n0. 返回主菜单\n请选择：" action
-如果 [[ $action == "1" ]]; then
+if [[ $action == "1" ]]; then
 stop
 elif [[ $action == "2" ]]; then
 restart
@@ -465,7 +465,7 @@ fi
 xuichange(){
 echo
 readp "1. 更改 x-ui 用户名与密码 \n2. 更改 x-ui 面板登录端口\n3. 更改 x-ui 面板根路径\n4. 重置 x-ui 面板设置（面板设置选项中所有设置都恢复出厂设置，登录端口与面板根路径将重新自定义，账号密码不变）\n0. 返回主菜单\n请选择：" action
-如果 [[ $action == "1" ]]; then
+if [[ $action == "1" ]]; then
 userinstall && restart
 elif [[ $action == "2" ]]; then
 portinstall && restart
@@ -479,38 +479,38 @@ fi
 }
 show_status(){
 check_status
-如果 [[ $? == 0 ]]; then
+if [[ $? == 0 ]]; then
 green "x-ui运行状态：正常运行"
 else
-红 "x-ui运行状态：未运行"
+red "x-ui运行状态：未运行"
 fi
 }
 check_status() {
-如果 [[ x"${释放}" == x"alpine" ]]; then
+if [[ x"${release}" == x"alpine" ]]; then
 rc-service x-ui status >/dev/null 2>&1
-返回 $?
+return $?
 else
-systemctl is-active --静谧 x-ui
-返回 $?
+systemctl is-active --quiet x-ui
+return $?
 fi
 }
 openyn(){
-如果 [[ -e /usr/local/x-ui/x-ui.db && -e /usr/local/x-ui/x-ui ]]; then
-黄 "检测到已安装 x-ui"
-黄 "1. 保留原数据库并覆盖更新"
-黄 "2. 删除原数据库全新安装"
-黄 "0. 退出脚本"
+if [[ -e /usr/local/x-ui/x-ui.db && -e /usr/local/x-ui/x-ui ]]; then
+yellow "检测到已安装 x-ui"
+yellow "1. 保留原数据库并覆盖更新"
+yellow "2. 删除原数据库全新安装"
+yellow "0. 退出脚本"
 readp "请选择：" yn
-case $yn 在
+case $yn in
 1) green "保留原数据库覆盖更新……" && rm /usr/local/x-ui/bin -rf && rm /usr/local/x-ui/x-ui -f;;
-2) 红 "删除原数据库全新安装……" && rm /usr/local/x-ui -rf;;
+2) red "删除原数据库全新安装……" && rm /usr/local/x-ui -rf;;
 0) exit;;
-*) 红 "输入有误，请重新输入" && openyn;;
+*) red "输入有误，请重新输入" && openyn;;
 esac
 fi
 }
 cronxui(){
-如果 [[ ! -e /usr/local/x-ui/goxui.sh ]]; then
+if [[ ! -e /usr/local/x-ui/goxui.sh ]]; then
 echo '#!/bin/bash' > /usr/local/x-ui/goxui.sh
 echo 'systemctl restart x-ui >/dev/null 2>&1' >> /usr/local/x-ui/goxui.sh
 chmod +x /usr/local/x-ui/goxui.sh
@@ -524,80 +524,80 @@ rm /tmp/crontab.tmp
 }
 xuigo(){
 check_status
-如果 [[ $? != 0 ]]; then
+if [[ $? != 0 ]]; then
 restart
 fi
 }
 show_menu(){
-清除
+clear
 blue "================================================================"
-白 "甬哥侃侃侃x-ui精简修改版一键脚本，面板中的相关设置与原作者[vaxilu]保持一致"
-白 "博客地址：https://ygkkk.blogspot.com"
-白 "Youtube 频道：甬哥侃侃侃"
-白 "交流群组：https://t.me/+jZHc6-A-1QQ5ZGVl"
+white "甬哥侃侃侃x-ui精简修改版一键脚本，面板中的相关设置与原作者[vaxilu]保持一致"
+white "博客地址：https://ygkkk.blogspot.com"
+white "Youtube 频道：甬哥侃侃侃"
+white "交流群组：https://t.me/+jZHc6-A-1QQ5ZGVl"
 blue "================================================================"
-如果 [[ -e /usr/local/x-ui/x-ui ]]; then
+if [[ -e /usr/local/x-ui/x-ui ]]; then
 show_status
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 blue " x-ui-yg $(cat /usr/local/x-ui/v 2>/dev/null) 管理菜单"
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 green " 1. 更新 x-ui"
-黄 " 2. 卸载 x-ui"
-白 "----------------------------------------------------------------"
+yellow " 2. 卸载 x-ui"
+white "----------------------------------------------------------------"
 green " 3. 停止 x-ui"
 green " 4. 重启 x-ui"
 green " 5. 查看 x-ui 日志"
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 green " 6. 修改 x-ui 账号密码"
 green " 7. 修改 x-ui 面板端口"
 green " 8. 修改 x-ui 面板根路径"
 green " 9. 重置 x-ui 面板设置"
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 green " 10. 查看 x-ui 面板信息"
 green " 11. 配置 WARP 代理"
 green " 12. 配置 WARP 免费 VPN"
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 green " 13. 申请证书"
 green " 14. 安装 BBR"
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 blue " 0. 退出脚本"
 echo
 readp "请输入数字 [0-14]:" num
-case $num 在
+case $num in
 1) update;;
 2) uninstall;;
-3) stop && 返回;;
-4) restart && 返回;;
-5) show_log && 返回;;
+3) stop && back;;
+4) restart && back;;
+5) show_log && back;;
 6) xuichange;;
 7) xuichange;;
 8) xuichange;;
 9) xuichange;;
-10) showxuiip && echo && cat /usr/local/x-ui/xip && echo && 返回;;
+10) showxuiip && echo && cat /usr/local/x-ui/xip && echo && back;;
 11) cfwarp;;
 12) cfwarp;;
 13) acme;;
 14) bbr;;
 0) exit;;
-*) 红 "请输入正确数字 [0-14]" && sleep 2 && show_menu;;
+*) red "请输入正确数字 [0-14]" && sleep 2 && show_menu;;
 esac
 else
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 blue " x-ui-yg 安装菜单"
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 green " 1. 安装 x-ui"
-白 "----------------------------------------------------------------"
+white "----------------------------------------------------------------"
 blue " 0. 退出脚本"
 echo
 readp "请输入数字 [0-1]:" num
-case $num 在
+case $num in
 1) xuiinstall;;
 0) exit;;
-*) 红 "请输入正确数字 [0-1]" && sleep 2 && show_menu;;
+*) red "请输入正确数字 [0-1]" && sleep 2 && show_menu;;
 esac
 fi
 }
-如果 [ ! -f /usr/bin/x-ui ]; then
+if [ ! -f /usr/bin/x-ui ]; then
 show_menu
 else
 show_menu
